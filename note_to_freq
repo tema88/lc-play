@@ -1,0 +1,64 @@
+#!/usr/bin/env perl
+
+$octave = 49;
+$duration = 1;
+$tempo = 1;
+
+%note = ( "c"  =>  0, "c#" =>  1, "d"  =>  2, 
+          "d#" =>  3, "e"  =>  4, "f"  =>  5,
+          "f#" =>  6, "g"  =>  7, "g#" =>  8,
+          "a"  =>  9, "a#" => 10, "b"  => 11 );
+
+$split_notes = $ENV{TERM} eq "linux";
+
+line:
+while (<STDIN>) {
+	chomp;
+	if (/^\s*#/) {
+		next;
+	}
+	@line = split / /, $_;
+	note:
+	for (@line) {
+		if (/o(\d)/) {
+			$octave = 12 * $1 + 1; 
+			next;
+		} elsif (/t([0-9.]+)/) {
+			$tempo = $1;
+			next;
+		} elsif (s/(\d+)//) {
+			$d = $1;
+			if (s|/||) {
+				$duration = 4 / $d;
+			} else {
+				$duration = $d;
+			}
+		}
+
+		if (s|\+||) {
+			$duration *= 1.5;
+		}
+
+		if (/r/) {
+			$freq = 0;
+		} else {
+			$note_id = $octave + $note{$_};
+			$freq = 440 * 2 ** (($note_id - 58) / 12);
+		}
+
+		$e_duration = $tempo * $duration;
+	
+		if ($split_notes) {
+			while ($e_duration >= 2) {
+				$e_duration -= 2;
+				printf "%.2f %.2f\n", $freq, 1.99;
+			}
+			if (not $e_duration) {
+				next note;
+			}
+		}
+
+		printf "%.2f %.2f\n", $freq, $e_duration;
+	}
+}
+

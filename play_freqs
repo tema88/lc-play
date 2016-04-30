@@ -1,0 +1,19 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+if [ "$TERM" == "linux" ]
+then
+	while read pitch duration
+	do
+		play_freq_linux $pitch $duration
+	done 
+else
+	echo Must be run from Linux console.
+	exit
+
+	while read pitch duration
+	do
+		perl play_freq $pitch $duration
+	done | 
+	aplay -f S16_LE -c1 -r48000;
+fi

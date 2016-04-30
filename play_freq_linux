@@ -1,0 +1,9 @@
+#!/bin/bash
+
+freq=${1%.*}
+duration=$(bc <<<"1000 * $2")
+duration=${duration%.*}
+
+echo -ne "\e[10;$freq]\e[11;$duration]\a";
+
+sleep "$2"

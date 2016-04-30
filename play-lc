@@ -1,0 +1,12 @@
+#!/bin/bash
+
+export PATH="$PATH:$(dirname "$0")"
+
+if [ -r "$1" ]
+then
+	cat "$@"
+else
+	echo "$*"
+fi |
+note_to_freq |
+play_freqs 
